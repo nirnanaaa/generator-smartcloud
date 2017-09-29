@@ -18,7 +18,11 @@ module.exports = class extends Generator {
       type: String,
       defaults: 'mocha'
     });
-
+    this.option('base-directory', {
+      desc: 'Where to install the files',
+      type: String,
+      defaults: '.'
+    });
     this.option('babel', {
       desc: 'Use Babel',
       type: Boolean,
@@ -40,11 +44,30 @@ module.exports = class extends Generator {
   }
 
   writing() {
+    mkdirp(`${this.options['base-directory']}/src/widgets/${this.name}`);
     this.fs.copyTpl(
-      this.templatePath('index.html'),
-      this.destinationPath('public/index.html'),
-      { title: 'Templating with Yeoman' }
+      this.templatePath('WidgetTemplate.js'),
+      this.destinationPath(`${this.options['base-directory']}/src/widgets/${this.name}/index.js`),
+      { widgetName: this.name }
     );
+    const renderConfig = {
+      file: this.destinationPath(`${this.options['base-directory']}/src/main.js`),
+      needle: '// yo-insert-above',
+      splicable: [
+        `    new Module('${this.name}', props => <${this.name} {...props}/>, true),`,
+      ]
+    };
+
+    util.rewriteFile(renderConfig);
+    const importConfig = {
+      file: this.destinationPath(`${this.options['base-directory']}/src/main.js`),
+      needle: "import React from 'react'",
+      splicable: [
+        `import ${this.name} from './widgets/${this.name}'`
+      ]
+    };
+
+    util.rewriteFile(importConfig);
   }
 
 };

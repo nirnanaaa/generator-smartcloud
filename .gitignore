@@ -1,4 +1,4 @@
 node_modules
-react
+react/src/widgets
 .idea
 coverage
