@@ -90,7 +90,7 @@ module.exports = class extends Generator {
       needle: 'module.exports = webpackConfig',
       splicable: [
         'webpackConfig.modules.loaders.push({',
-        '    test: /\\.json$/',
+        '    test: /\\.json$/,',
         '    exclude: /node_modules/,',
         "    loader: 'json-loader',",
         '})'
